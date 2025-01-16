@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Ejemplo de Modelado y Normalización</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        h2 { color: #333; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid black; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .diagram { border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
+        .use-case, .class { margin-bottom: 10px; }
+        .use-case { background-color: #e0e0e0; padding: 10px; border-radius: 5px; }
+        .class { background-color: #f9f9f9; padding: 10px; border-radius: 5px; }
+        .arrow { font-size: 20px; margin: 0 10px; }
+        ul { list-style-type: none; padding-left: 0; }
+        .step { border: 1px solid black; padding: 10px; border-radius: 5px; background-color: #f4f4f4; margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <h1>Ejemplo de Modelado y Normalización</h1>
+
+    <!-- Primera Ley de Normalización -->
+    <h2>Primera Ley de Normalización</h2>
+    <h3>Clientes</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ID Cliente</th>
+                <th>Nombre</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>Ana Pérez</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Juan Gómez</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Teléfonos de Cliente</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ID Teléfono</th>
+                <th>ID Cliente</th>
+                <th>Teléfono</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>1</td>
+                <td>1234567890</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>1</td>
+                <td>0987654321</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Diagrama de Actividades -->
+    <h2>Diagrama de Actividades</h2>
+    <div class="diagram">
+        <ul>
+            <li class="step">1. Seleccionar producto</li>
+            <li class="arrow">→</li>
+            <li class="step">2. Agregar al carrito</li>
+            <li class="arrow">→</li>
+            <li class="step">3. Realizar pago</li>
+            <li class="arrow">→</li>
+            <li class="step">4. Confirmar pedido</li>
+            <li class="arrow">→</li>
+            <li class="step">5. Enviar confirmación</li>
+        </ul>
+    </div>
+
+    <!-- Diagrama de Caso de Uso -->
+    <h2>Diagrama de Caso de Uso</h2>
+    <div class="use-case">
+        <strong>Cliente</strong>
+        <ul>
+            <li>Hacer Reserva</li>
+            <li>Cancelar Reserva</li>
+        </ul>
+    </div>
+    <div class="use-case">
+        <strong>Administrador</strong>
+        <ul>
+            <li>Gestionar Habitaciones</li>
+            <li>Ver Reservas</li>
+        </ul>
+    </div>
+
+    <!-- Diagrama de Clases -->
+    <h2>Diagrama de Clases</h2>
+    <div class="class">
+        <h3>Estudiante</h3>
+        <ul>
+            <li>ID_Estudiante: int</li>
+            <li>Nombre: string</li>
+            <li>Fecha_Nacimiento: date</li>
+        </ul>
+        <ul>
+            <li>InscribirEnCurso(curso: Curso)</li>
+            <li>EliminarInscripción(curso: Curso)</li>
+        </ul>
+    </div>
+    <div class="class">
+        <h3>Curso</h3>
+        <ul>
+            <li>ID_Curso: int</li>
+            <li>Nombre: string</li>
+        </ul>
+        <ul>
+            <li>AgregarEstudiante(estudiante: Estudiante)</li>
+            <li>EliminarEstudiante(estudiante: Estudiante)</li>
+        </ul>
+    </div>
+</body>
+</html>

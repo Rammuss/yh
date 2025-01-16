@@ -1,0 +1,100 @@
+/* Estilos básicos para la barra de navegación */
+/* <div id="navbar-container"></div> */
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap');
+
+body {
+  background-color: #fafafa; /* Fondo claro y fresco */
+  font-family: 'Montserrat', sans-serif; /* Tipografía suave y moderna */
+  padding: 20px;
+}
+h1 {
+  text-align: center;
+}
+.navbar {
+  font-family: 'Montserrat', sans-serif;
+  background-color: #ffffff;
+  border-bottom: 3px solid #ff69b4; /* Rosa vibrante para un toque de color */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra suave para darle profundidad */
+  padding: 0 20px;
+}
+
+.navbar ul {
+  justify-content: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.navbar li {
+  position: relative;
+}
+
+.navbar a {
+  display: block;
+  padding: 15px;
+  color: #333; /* Color de texto oscuro para legibilidad */
+  text-decoration: none;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  border: 2px solid transparent;
+  border-radius: 5px; /* Bordes más redondeados para un look suave */
+  margin: 0 5px;
+}
+
+.navbar a:hover {
+  background-color: #ff69b4; /* Fondo rosa vibrante al pasar el mouse */
+  color: #fff; /* Cambiar el color del texto al pasar el mouse */
+  transform: scale(1.05);
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #ffffff;
+  border: 2px solid #ff69b4;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: #333;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  border-bottom: 1px solid #ff69b4;
+}
+
+.dropdown-content a:hover {
+  background-color: #ff69b4;
+  color: #fff;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+/* Estilos para dispositivos móviles */
+@media screen and (max-width: 768px) {
+  .navbar ul {
+    flex-direction: column; /* Cambiar la dirección de flexbox para apilar verticalmente */
+    text-align: center;
+  }
+
+  .navbar li {
+    width: 100%; /* Asegurar que cada elemento ocupe todo el ancho en móviles */
+  }
+
+  .dropdown-content {
+    position: relative;
+    min-width: 100%;
+  }
+
+  .dropdown:hover .dropdown-content {
+    display: block;
+  }
+}
+
+
+
