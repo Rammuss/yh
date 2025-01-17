@@ -2,7 +2,7 @@
 include "../conexion/configv2.php";
 header('Content-Type: application/json');
 
-$query = "SELECT id, nombre, costo FROM servicios WHERE tipo = 'servicio'";
+$query = "SELECT id, nombre, costo FROM servicios WHERE tipo = 'insumo'";
 $result = pg_query($conn, $query);
 
 $services = [];

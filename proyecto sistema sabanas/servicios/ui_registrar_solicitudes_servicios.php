@@ -104,6 +104,14 @@
                         <button class="button is-link is-light ml-2" type="button" id="agregarServicio">Agregar Servicio</button>
                     </div>
                 </div>
+                <!-- Insumos -->
+                <div class="field"> <label class="label">Seleccionar Insumo</label>
+                    <div class="control">
+                        <div class="select"> <select id="insumo">
+                                <option value="" disabled selected>Selecciona un insumo</option>
+                            </select> </div>
+                    </div> <button class="button is-primary" id="agregarInsumo" type="button">Agregar Insumo</button>
+                </div>
 
                 <!-- Promociones -->
                 <div class="field">
@@ -155,7 +163,10 @@
                     <div class="control">
                         <button class="button is-primary" type="submit">Registrar Solicitud</button>
                     </div>
+
                 </div>
+
+
             </form>
         </div>
     </section>
@@ -194,16 +205,24 @@
             const data = Object.fromEntries(formData.entries());
             const servicios = [];
             const costos = [];
+            const insumos = [];
+            const insumoCostos = [];
             const promociones = [];
             const precios = [];
             document.querySelectorAll("#detalleServicios tbody tr").forEach(row => {
                 const servicio = row.querySelector('input[name="servicio[]"]');
                 const costo = row.querySelector('input[name="costo[]"]');
+                const insumo = row.querySelector('input[name="insumo[]"]');
+                const insumoCosto = row.querySelector('input[name="costo[]"]');
                 const promocion = row.querySelector('input[name="promocion[]"]');
                 const precio = row.querySelector('input[name="precio[]"]');
                 if (servicio && costo) {
                     servicios.push(servicio.value);
                     costos.push(costo.value);
+                }
+                if (insumo && insumoCosto) {
+                    insumos.push(insumo.value);
+                    insumoCostos.push(insumoCosto.value);
                 }
                 if (promocion && precio) {
                     promociones.push(promocion.value);
@@ -214,6 +233,10 @@
                 data.servicios = servicios;
                 data.costos = costos;
             }
+            if (insumos.length > 0) {
+                data.insumos = insumos;
+                data.insumoCostos = insumoCostos;
+            }
             if (promociones.length > 0) {
                 data.promociones = promociones;
                 data.precios = precios;
@@ -222,6 +245,9 @@
             delete data["servicio"];
             delete data["servicio[]"];
             delete data["costo[]"];
+            delete data["insumo"];
+            delete data["insumo[]"];
+            delete data["insumoCosto[]"];
             delete data["promocion"];
             delete data["promocion[]"];
             delete data["precio[]"];
@@ -246,6 +272,7 @@
                 console.error("Error al enviar el formulario:", error);
             }
         });
+
 
 
         // Evento del botón Nuevo Cliente
@@ -410,6 +437,41 @@
             }
         });
     </script>
+
+    <script>
+        //obtener insumos
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Cargar los insumos dinámicamente
+            const response = await fetch('../servicios/obtener_insumos.php');
+            const insumos = await response.json();
+
+            const select = document.getElementById('insumo');
+            insumos.forEach(insumo => {
+                const option = document.createElement('option');
+                option.value = insumo.id;
+                option.textContent = `${insumo.nombre} - ${insumo.costo} Gs`;
+                option.setAttribute('data-costo', insumo.costo); // Agregar el costo como un atributo de datos
+                select.appendChild(option);
+            });
+        });
+
+        // Agregar insumos al detalle
+        document.getElementById("agregarInsumo").addEventListener("click", () => {
+            const select = document.getElementById("insumo");
+            const insumoSeleccionado = select.options[select.selectedIndex];
+            const tbody = document.getElementById("detalleServicios").querySelector("tbody");
+            if (insumoSeleccionado.value) { // Crear fila con datos
+                const fila = document.createElement("tr");
+                const costo = insumoSeleccionado.getAttribute('data-costo');
+                fila.innerHTML = ` <td>${insumoSeleccionado.textContent.split(' - ')[0]}</td>
+                 <td>${costo}</td> 
+                 <td> <button class="button is-danger is-light eliminarServicio" type="button">Eliminar</button> </td>
+                  <input type="hidden" name="servicio[]" value="${insumoSeleccionado.value}"> <input type="hidden" name="costo[]" value="${costo}"> `;
+                tbody.appendChild(fila);
+            }
+        })
+    </script>
+
 
     <script>
         // Deshabilitar campos de selección de acuerdo a la selección

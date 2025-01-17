@@ -14,14 +14,25 @@ $precios = isset($data['precios']) ? $data['precios'] : [];
 // Conexión a la base de datos
 include "../conexion/configv2.php";
 
-// Calcular el total de servicios antes de aplicar el descuento
 $totalServicios = 0;
+
+// Sumar los costos
 foreach ($costos as $costo) {
     $totalServicios += $costo;
 }
 
-// Aplicar el descuento si existe
-$montoFinal = $totalServicios - ($totalServicios * ($descuento / 100));
+// Sumar los precios, si existen
+foreach ($precios as $precio) {
+    $totalServicios += $precio;
+}
+
+// Aplicar el descuento si no hay precios
+if (empty($precios) && count($costos) > 0) {
+    $montoFinal = $totalServicios - ($totalServicios * ($descuento / 100));
+} else {
+    $montoFinal = $totalServicios;
+}
+
 
 // Iniciar la transacción
 pg_query($conn, "BEGIN");
@@ -36,37 +47,57 @@ try {
     }
     $idCabecera = pg_fetch_result($result, 0, 'id_cabecera');
 
-    // Insertar los detalles (servicios_detalle) en filas separadas para cada servicio y promoción
-    foreach ($servicios as $index => $servicio) {
-        $idServicio = $servicio;
-        $costoServicio = $costos[$index];
-        $idPromocion = isset($promociones[$index]) ? $promociones[$index] : null;
-        $costoPromocion = isset($precios[$index]) ? $precios[$index] : null;
+// Insertar los detalles (servicios_detalle) en filas separadas para cada servicio y promoción
+foreach ($servicios as $index => $servicio) {
+    $idServicio = isset($servicio) ? $servicio : null;
+    $costoServicio = isset($costos[$index]) ? $costos[$index] : null;
+    $idPromocion = isset($promociones[$index]) ? $promociones[$index] : null;
+    $costoPromocion = isset($precios[$index]) ? $precios[$index] : null;
 
-        // Insertar el servicio normal (sin promoción) si tiene costo
-        $queryDetalleServicio = "INSERT INTO servicios_detalle (id_cabecera, id_servicio, costo_servicio, costo_promocion) 
-                                 VALUES ($idCabecera, $idServicio, $costoServicio, NULL)";
+    // Insertar el servicio normal (sin promoción) si tiene costo
+    if ($idServicio !== null && $costoServicio !== null) {
+        $queryDetalleServicio = "INSERT INTO servicios_detalle (id_cabecera, id_servicio, costo_servicio, id_promocion, costo_promocion) 
+                                 VALUES ($idCabecera, $idServicio, $costoServicio, NULL, NULL)";
         $resultDetalleServicio = pg_query($conn, $queryDetalleServicio);
         if (!$resultDetalleServicio) {
             throw new Exception("Error al insertar detalle sin promoción: " . pg_last_error());
         }
+    }
 
-        // Si hay promoción, insertar también la fila correspondiente con el costo promocional
-        if ($idPromocion && $costoPromocion !== null) {
-            $queryDetallePromocion = "INSERT INTO servicios_detalle (id_cabecera, id_servicio, costo_servicio, costo_promocion) 
-                                      VALUES ($idCabecera, $idServicio, $costoServicio, '$costoPromocion')";
+    // Insertar la promoción si existe
+    if ($idPromocion !== null && $costoPromocion !== null) {
+        $queryDetallePromocion = "INSERT INTO servicios_detalle (id_cabecera, id_servicio, costo_servicio, id_promocion, costo_promocion) 
+                                  VALUES ($idCabecera, NULL, NULL, $idPromocion, $costoPromocion)";
+        $resultDetallePromocion = pg_query($conn, $queryDetallePromocion);
+        if (!$resultDetallePromocion) {
+            throw new Exception("Error al insertar detalle con promoción: " . pg_last_error());
+        }
+    }
+}
+
+// Insertar promociones que no tienen un servicio asociado
+foreach ($promociones as $index => $promocion) {
+    if (!isset($servicios[$index])) {
+        $idPromocion = $promocion;
+        $costoPromocion = isset($precios[$index]) ? $precios[$index] : null;
+
+        if ($costoPromocion !== null) {
+            $queryDetallePromocion = "INSERT INTO servicios_detalle (id_cabecera, id_servicio, costo_servicio, id_promocion, costo_promocion) 
+                                      VALUES ($idCabecera, NULL, NULL, $idPromocion, $costoPromocion)";
             $resultDetallePromocion = pg_query($conn, $queryDetallePromocion);
             if (!$resultDetallePromocion) {
-                throw new Exception("Error al insertar detalle con promoción: " . pg_last_error());
+                throw new Exception("Error al insertar detalle de solo promoción: " . pg_last_error());
             }
         }
     }
+}
+
+
 
     // Confirmar la transacción
     pg_query($conn, "COMMIT");
 
     echo json_encode(["status" => "success", "message" => "Registros insertados correctamente"]);
-
 } catch (Exception $e) {
     // En caso de error, revertir la transacción
     pg_query($conn, "ROLLBACK");
@@ -75,4 +106,3 @@ try {
 
 // Cerrar la conexión
 pg_close($conn);
-?>

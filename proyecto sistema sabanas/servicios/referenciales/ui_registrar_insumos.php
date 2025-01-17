@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrar Servicio</title>
+    <title>Registrar Insumos</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
 </head>
 <body>
     <section class="section">
         <div class="container">
-            <h1 class="title">Registrar Servicio</h1>
+            <h1 class="title">Registrar Insumos</h1>
             <form id="service-form">
                 <div class="field">
-                    <label class="label">Nombre del Servicio</label>
+                    <label class="label">Nombre del Insumos</label>
                     <div class="control">
-                        <input class="input" type="text" id="service-name" placeholder="Nombre del Servicio" required>
+                        <input class="input" type="text" id="service-name" placeholder="Nombre del Insumos" required>
                     </div>
                 </div>
                 <div class="field">
@@ -24,12 +24,12 @@
                     </div>
                 </div>
                 <div class="field">
-                    <label class="label">Tipo de Servicio</label>
+                    <label class="label">Tipo de Insumos</label>
                     <div class="control">
                         <div class="select">
                             <select id="service-type" required>
                                 <option value="" disabled selected>Selecciona el tipo</option>
-                                <option value="servicio">Servicio</option>
+                                <option value="insumo">Insumos</option>
                             </select>
                         </div>
                     </div>
