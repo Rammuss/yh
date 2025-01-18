@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Presupuesto de Servicio</title>
+    <title>Solictud de Servicio</title>
     <link href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css" rel="stylesheet">
 </head>
 <body>
@@ -60,7 +60,7 @@
                     $detalles = pg_fetch_all($result_detalle);
             ?>
 
-            <h1 class="title">Presupuesto de Servicio</h1>
+            <h1 class="title">Solicitud de Servicio</h1>
             <div class="box">
                 <p><strong>Cliente:</strong> <?php echo $cabecera['cliente_nombre'] . " " . $cabecera['cliente_apellido']; ?></p>
                 <p><strong>Dirección:</strong> <?php echo $cabecera['direccion']; ?></p>
@@ -72,7 +72,7 @@
                 <p><strong>Monto Total:</strong> <?php echo number_format($cabecera['monto_total'], 2); ?></p>
             </div>
 
-            <h2 class="subtitle">Detalles del Servicio</h2>
+            <h2 class="subtitle">Detalles</h2>
             <div class="table-container">
                 <table class="table is-striped is-fullwidth">
                     <thead>

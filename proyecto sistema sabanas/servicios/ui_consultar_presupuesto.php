@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Solicitudes</title>
+    <title>Consultar Presupuesto</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
 </head>
 
@@ -12,8 +12,7 @@
     <!-- Encabezado -->
     <section class="hero is-primary">
         <div class="hero-body">
-            <p class="title">Gestión de Solicitudes</p>
-            <p class="subtitle">Visualiza y gestiona las solicitudes registradas</p>
+            <p class="title">Consultar Presupuesto</p>
         </div>
     </section>
 
@@ -23,7 +22,7 @@
 
             <!-- Botón para nueva solicitud -->
             <div class="buttons">
-                <a href="../servicios//ui_registrar_solicitudes_servicios.php" class="button is-primary">Nueva Solicitud</a>
+                <a href="../servicios/ui_registrar_presupuesto.php" class="button is-primary">Nuevo Presupuesto</a>
             </div>
 
             <!-- Filtros de búsqueda -->
@@ -48,7 +47,7 @@
                                     <select id="estadoFiltro">
                                         <option value="">Todos</option>
                                         <option value="pendiente">Pendiente</option>
-                                        <option value="en proceso">En proceso</option>
+                                        <option value="aprobado">Aprobado</option>
                                         <option value="rechazado">Rechazado</option>
                                         <option value="completado">Completado</option>
                                     </select>
@@ -111,7 +110,7 @@
 
             try {
                 // Realizar la solicitud al backend
-                const response = await fetch("../servicios/obtener_solicitudes_servicios.php", {
+                const response = await fetch("../servicios/obtener_presupuestos_servicios.php", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -157,8 +156,7 @@
                     <td>${solicitud.descuento ? parseFloat(solicitud.descuento).toFixed(2) : "0.00"}</td>
                     <td>${solicitud.estado}</td>
                     <td>
-                        <button class="button is-small is-info" data-id="${solicitud.id}">Ver</button>
-                        <button class="button is-small is-warning" data-id="${solicitud.id}">Orden de servicio</button>
+                        <button class="button is-small is-info" data-id="${solicitud.id}">Presupuesto</button>
                         <button class="button is-small is-danger" data-id="${solicitud.id}">Rechazar</button>
                     </td>
                 </tr>
@@ -179,7 +177,7 @@
             if (solicitudId) {
                 // Si el clic fue en el botón "Presupuesto"
                 if (target.classList.contains("is-info")) {
-                    window.location.href = `../servicios/pdf_solicitud.php?id=${solicitudId}`;
+                    window.location.href = `../servicios/generar_presupuesto_v2.php?id=${solicitudId}`;
                 }
                 // Si el clic fue en el botón "Orden de servicio"
                 else if (target.classList.contains("is-warning")) {
@@ -189,7 +187,7 @@
                 // Si el clic fue en el botón "Rechazar"
                 else if (target.classList.contains("is-danger")) {
                     try {
-                        const response = await fetch('../servicios/rechazar_solicitud_servicio.php', {
+                        const response = await fetch('../servicios/rechazar_solicitud_servicios_v2.php', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
