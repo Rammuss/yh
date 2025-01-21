@@ -60,45 +60,42 @@ if ($id_orden && $id_solicitud) {
         $html = "
         <html>
         <head>
-            <style>
-                body { font-family: Arial, sans-serif; }
-                h1 { text-align: center; }
-                .container { margin: 20px; }
-                .buttons { text-align: center; margin-top: 20px; }
-                .table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                .table th, .table td { border: 1px solid black; padding: 8px; text-align: left; }
-            </style>
+            <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css'>
         </head>
         <body>
-            <h1>Orden de Trabajo</h1>
-            <div class='container'>
-                <p><strong>ID Orden:</strong> {$orden['id_orden']}</p>
-                <p><strong>Fecha:</strong> {$orden['fecha']}</p>
-                <p><strong>Estado:</strong> {$orden['estado']}</p>
-                <p><strong>Cliente:</strong> {$orden['cliente_nombre']} (RUC/CI: {$orden['cliente_ruc_ci']})</p>
-                <p><strong>Trabajador Asignado:</strong> {$orden['trabajador_nombre']}</p>
-                <p><strong>Observaciones:</strong> {$orden['observaciones']}</p>
+            <section class='section'>
+                <div class='container'>
+                    <h1 class='title has-text-centered'>Orden de Trabajo</h1>
+                    <div class='box'>
+                        <p><strong>ID Orden:</strong> {$orden['id_orden']}</p>
+                        <p><strong>Fecha:</strong> {$orden['fecha']}</p>
+                        <p><strong>Estado:</strong> {$orden['estado']}</p>
+                        <p><strong>Cliente:</strong> {$orden['cliente_nombre']} (RUC/CI: {$orden['cliente_ruc_ci']})</p>
+                        <p><strong>Trabajador Asignado:</strong> {$orden['trabajador_nombre']}</p>
+                        <p><strong>Observaciones:</strong> {$orden['observaciones']}</p>
+                    </div>
 
-                <h2>Detalles de Servicios</h2>
-                <table class='table'>
-                    <thead>
-                        <tr>
-                            <th>Servicio/Insumo</th>
-                            <th>Cantidad</th>
-                            <th>Costo Unitario</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        $detalles_html
-                    </tbody>
-                </table>
+                    <h2 class='subtitle'>Detalles de Servicios</h2>
+                    <table class='table is-fullwidth'>
+                        <thead>
+                            <tr>
+                                <th>Servicio/Insumo</th>
+                                <th>Cantidad</th>
+                                <th>Costo Unitario</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            $detalles_html
+                        </tbody>
+                    </table>
 
-                <div class='buttons'>
-                    <button onclick='window.history.back()'>Atrás</button>
-                    <button onclick='window.print()'>Imprimir</button>
+                    <div class='buttons is-centered'>
+                        <button class='button is-link' onclick='window.history.back()'>Atrás</button>
+                        <button class='button is-primary' onclick='window.print()'>Imprimir</button>
+                    </div>
                 </div>
-            </div>
+            </section>
         </body>
         </html>
         ";

@@ -158,7 +158,6 @@
                     <td>${solicitud.estado}</td>
                     <td>
                         <button class="button is-small is-info" data-id="${solicitud.id}">Ver</button>
-                        <button class="button is-small is-warning" data-id="${solicitud.id}">Orden de servicio</button>
                         <button class="button is-small is-danger" data-id="${solicitud.id}">Rechazar</button>
                     </td>
                 </tr>
