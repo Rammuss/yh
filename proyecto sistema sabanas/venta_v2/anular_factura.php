@@ -7,7 +7,7 @@ include '../conexion/configv2.php'; // Asegúrate de que este archivo tiene la c
 // Obtener los datos enviados
 $data = json_decode(file_get_contents('php://input'), true);
 
-$numero_factura = $data['numero_factura'] ?? null;
+$numero_factura = $data['id_venta'] ?? null;
 $estado = $data['estado'] ?? null;
 
 // Verificar si los parámetros están disponibles
@@ -20,7 +20,7 @@ if (empty($numero_factura) || empty($estado)) {
 }
 
 // Actualizar el estado de la factura en la base de datos
-$query = "UPDATE ventas SET estado = '$estado' WHERE numero_factura = '$numero_factura'";
+$query = "UPDATE ventas SET estado = '$estado' WHERE id = '$numero_factura'";
 
 $result = pg_query($conn, $query);
 

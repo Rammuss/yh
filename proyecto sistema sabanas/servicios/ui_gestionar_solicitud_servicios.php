@@ -6,9 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Solicitudes</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="../servicios/styles_venta.css">
+    <script src="../servicios/navbar.js"></script>
 </head>
 
 <body>
+<div id="navbar-container"></div>
     <!-- Encabezado -->
     <section class="hero is-primary">
         <div class="hero-body">

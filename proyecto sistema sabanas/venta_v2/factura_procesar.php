@@ -39,8 +39,8 @@ $forma_pago = $data['cabecera']['forma_pago'];
 $cuotas = (int) $data['cabecera']['cantidad_cuotas'];
 $fecha = $data['cabecera']['fecha_venta'];
 $metodo_pago = $data['cabecera']['metodo_pago']; // Nuevo campo
-$solicitud_id = isset($data['cabecera']['solicitud_id']) ? (int) $data['cabecera']['solicitud_id'] : null; // Nuevo campo opcional
-$monto_total_servicios = isset($data['cabecera']['monto_total_servicios']) ? (float) $data['cabecera']['monto_total_servicios'] : null; // Nuevo campo opcional
+$solicitud_id = !empty($data['cabecera']['solicitud_id']) ? (int) $data['cabecera']['solicitud_id'] : null;
+$monto_total_servicios = isset($data['cabecera']['montoTotal']) ? (float) $data['cabecera']['montoTotal'] : 0.0;
 $nota_credito_id = isset($data['cabecera']['nota_credito_id']) ? (int) $data['cabecera']['nota_credito_id'] : null;
 
 // Validar el formato de la fecha
@@ -76,6 +76,24 @@ if ($nota_credito_id !== null) {
         echo json_encode([
             "success" => false,
             "message" => "Error al verificar la nota de crédito: $error"
+        ]);
+        pg_close($conn);
+        exit;
+    }
+}
+
+// Si se proporciona un `solicitud_id`, obtener el `monto_total` de la tabla `servicios_cabecera`
+if ($solicitud_id !== null) {
+    $query_monto_total = "SELECT monto_total FROM public.servicios_cabecera WHERE id_cabecera = $1";
+    $result_monto_total = pg_query_params($conn, $query_monto_total, [$solicitud_id]);
+
+    if ($result_monto_total) {
+        $monto_total_servicios = pg_fetch_result($result_monto_total, 0, 'monto_total');
+    } else {
+        http_response_code(500);
+        echo json_encode([
+            "success" => false,
+            "message" => "Error al obtener el monto total de la solicitud."
         ]);
         pg_close($conn);
         exit;

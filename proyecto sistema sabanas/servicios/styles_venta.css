@@ -1,0 +1,155 @@
+/* Estilos básicos para la barra de navegación */
+/* <div id="navbar-container"></div> */
+
+@import url('https://fonts.cdnfonts.com/css/minecraft-3');
+
+body {
+  background-color: #f4f4f4;
+  /* Fondo oscuro para contrastar con la nav bar */
+  padding: 20px;
+}
+
+.navbar {
+  font-family: 'Minecraft', sans-serif;
+  background-color: #40E0D0;
+  /* Cambiado a fondo turquesa */
+  border-bottom: 4px solid #20B2AA;
+  /* Borde inferior turquesa oscuro */
+  padding: 0 20px;
+  display: flex;
+}
+
+.navbar-item span#nombre-usuario {
+  margin-left: 10px;
+  color: white;
+}
+
+.navbar ul {
+  justify-content: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.navbar li {
+  position: relative;
+}
+
+.navbar a {
+  display: flex;
+  padding: 15px;
+  color: #fff;
+  text-decoration: none;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  border: 2px solid #20B2AA;
+  /* Borde turquesa oscuro */
+  border-radius: 3px;
+  margin: 0 5px;
+}
+
+.navbar a:hover {
+  background-color: #20B2AA;
+  /* Cambiado a turquesa oscuro */
+  transform: scale(1.05);
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #40E0D0;
+  /* Fondo turquesa */
+  border: 2px solid #20B2AA;
+  /* Borde turquesa oscuro */
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: #fff;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  border-bottom: 1px solid #20B2AA;
+  /* Borde inferior turquesa oscuro */
+}
+
+.dropdown-content a:hover {
+  background-color: #20B2AA;
+  /* Cambiado a turquesa oscuro */
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.navbar ul li a.cerrar-sesion {
+  color: rgb(23, 6, 6);
+  /* Cambia el color del texto */
+  font-weight: bold;
+  /* Haz el texto más grueso */
+}
+
+.navbar img {
+  max-width: 50%;
+  /* La imagen no excederá el ancho del li */
+  max-height: 50%;
+  /* La imagen no excederá la altura del li */
+  object-fit: cover;
+}
+
+.perfil_contenedor {
+  display: flex;
+  align-items: center;
+  max-width: 250px; /* Limita el ancho máximo del contenedor */
+}
+
+#imagen-perfil {
+  margin-left: 0%;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+#nombre-usuario {
+  font-size: 16px;
+  color: white;
+}
+
+/* Estilo para p_perfil */
+.p_perfil {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Estilo para p2_perfil */
+.p2_perfil {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: auto; /* Permitir que el contenido determine el ancho */
+  height: auto; /* Permitir que el contenido determine la altura */
+  padding: 0 10px; /* Añadir un poco de padding para que no se vea demasiado ajustado */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Media queries para pantallas pequeñas */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  .navbar ul {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .navbar li {
+    margin-bottom: 

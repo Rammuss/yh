@@ -65,6 +65,7 @@
                 <table class="table is-fullwidth is-striped">
                     <thead>
                         <tr>
+                            <th>Id venta</th>
                             <th>RUC</th>
                             <th>Número de Factura</th>
                             <th>Fecha</th>
@@ -124,15 +125,16 @@
 
                                 const row = document.createElement('tr');
                                 row.innerHTML = `
-                        <td>${item.cedula_cliente}</td>
-                        <td>${item.numero_factura}</td>
-                        <td>${item.fecha}</td>
-                        <td class="${estadoClass}">${item.estado}</td>
-                        <td>
-                            <button class="button is-link" onclick="redirigir('${item.numero_factura}')">Ver</button>
-                            <button class="button is-danger" onclick="anularFactura('${item.numero_factura}')">Anular</button>
-                        </td>
-                    `;
+                            <td>${item.id_venta}</td> <!-- Nueva celda para el id_venta -->
+                            <td>${item.cedula_cliente}</td>
+                            <td>${item.numero_factura}</td>
+                            <td>${item.fecha}</td>
+                            <td class="${estadoClass}">${item.estado}</td>
+                            <td>
+                                <button class="button is-link" onclick="redirigir('${item.id_venta}')">Ver</button>
+                                <button class="button is-danger" onclick="anularFactura('${item.id_venta}')">Anular</button>
+                            </td>
+                        `;
                                 tbody.appendChild(row);
                             });
                         } else {
@@ -146,14 +148,15 @@
         });
 
 
+
         // Función para redirigir a la factura PDF
-        function redirigir(numero_factura) {
-            window.location.href = `../venta_v2/generar_factura_pdf.php?numero_factura=${numero_factura}`;
+        function redirigir(venta_id) {
+            window.location.href = `../venta_v2/comprobante_factura.php?venta_id=${venta_id}`;
         }
 
         // Función para anular la factura
-        function anularFactura(numero_factura) {
-            if (confirm(`¿Estás seguro de que deseas anular la factura ${numero_factura}?`)) {
+        function anularFactura(venta_id) {
+            if (confirm(`¿Estás seguro de que deseas anular la factura con ID ${venta_id}?`)) {
                 // Realizamos la solicitud para actualizar el estado de la factura
                 fetch('../venta_v2/anular_factura.php', {
                         method: 'POST',
@@ -161,7 +164,7 @@
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
-                            numero_factura: numero_factura,
+                            venta_id: venta_id, // Enviar venta_id en lugar de id_venta
                             estado: 'anulado'
                         })
                     })

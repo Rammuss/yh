@@ -6,9 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrar Solicitud de Servicios</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="../servicios/styles_venta.css">
+    <script src="../servicios/navbar.js"></script>
 </head>
 
 <body>
+<div id="navbar-container"></div>
     <section class="section">
         <div class="container">
             <h1 class="title">Registrar Solicitud de Servicios</h1>
@@ -88,7 +91,7 @@
                 <div class="field">
                     <label class="label">Fecha</label>
                     <div class="control">
-                        <input class="input" type="date" name="fecha" value="2025-01-14">
+                        <input class="input" type="date" name="fecha" id="fecha">
                     </div>
                 </div>
 
@@ -171,6 +174,16 @@
         </div>
     </section>
 
+    <script>
+        // Establecer la fecha actual en el campo de fecha
+        document.addEventListener('DOMContentLoaded', () => {
+            const fechaInput = document.getElementById('fecha');
+            const hoy = new Date();
+            const fechaHoy = hoy.toISOString().split('T')[0]; // Formato YYYY-MM-DD
+            fechaInput.value = fechaHoy;
+        });
+    </script>
+    
     <script>
         //Agregar servicios al detalle 
         document.getElementById("agregarServicio").addEventListener("click", () => {

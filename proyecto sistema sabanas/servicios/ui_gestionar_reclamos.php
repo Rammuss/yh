@@ -5,8 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Reclamos</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="../servicios/styles_venta.css">
+    <script src="../servicios/navbar.js"></script>
 </head>
 <body>
+<div id="navbar-container"></div>
     <section class="section">
         <div class="container">
             <h1 class="title">Gestión de Reclamos</h1>

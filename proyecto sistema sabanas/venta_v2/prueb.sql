@@ -66,9 +66,8 @@ BEGIN
     END IF;
 
     -- Si se ha proporcionado un monto total de servicios, sumarlo al total de la venta
-    IF p_monto_total_servicios IS NOT NULL THEN
-        v_monto_total := v_monto_total + p_monto_total_servicios;
-    END IF;
+        v_monto_total := v_monto_total + COALESCE(p_monto_total_servicios, 0);
+    
 
     -- Si se ha proporcionado una nota de crédito, aplicar su monto
     IF p_nota_credito_id IS NOT NULL THEN
@@ -91,10 +90,10 @@ BEGIN
 
     -- Insertar la cabecera de la venta incluyendo los campos solicitud_id y monto_total_servicios
     INSERT INTO ventas (
-        cliente_id, fecha, forma_pago, estado, cuotas, numero_factura, timbrado, nota_credito_id, monto_nc_aplicado, metodo_pago, solicitud_id, monto_total_servicios
+        cliente_id, fecha, forma_pago, estado, cuotas, numero_factura, timbrado, nota_credito_id, monto_nc_aplicado, metodo_pago, solicitud_id, monto_total_final
     )
     VALUES (
-        p_cliente_id, p_fecha, p_forma_pago, 'pendiente', p_cuotas, v_numero_factura, v_timbrado, p_nota_credito_id, v_monto_nc_aplicado, p_metodo_pago, p_solicitud_id, p_monto_total_servicios
+        p_cliente_id, p_fecha, p_forma_pago, 'pendiente', p_cuotas, v_numero_factura, v_timbrado, p_nota_credito_id, v_monto_nc_aplicado, p_metodo_pago, p_solicitud_id, v_monto_total
     )
     RETURNING id INTO v_venta_id;
 

@@ -1,196 +1,269 @@
 <?php
 // Conexión a la base de datos
-include '../conexion/configv2.php';
+include "../conexion/configv2.php";
 
-// Datos de la empresa ficticia
-$empresa = [
-    'nombre' => 'Empresa Ficticia S.A.',
-    'direccion' => 'Av. Principal 123, Ciudad, País',
-    'telefono' => '+595 1234 5678',
-    'email' => 'contacto@empresaficticia.com'
-];
+// Obtener el ID de la venta desde el parámetro de la URL o formulario
+$venta_id = isset($_GET['venta_id']) ? intval($_GET['venta_id']) : 0;
 
-// Obtener el venta_id desde la URL
-$venta_id = $_GET['venta_id'];
-
-// Consulta SQL para obtener los datos del comprobante
-$sql = "
-SELECT
-    v.numero_factura AS numero_factura,
-    v.fecha AS fecha,
-    c.nombre || ' ' || c.apellido AS cliente,
-    c.direccion AS direccion,
-    c.telefono AS telefono,
-    c.ruc_ci AS ruc_ci,
-    v.forma_pago AS forma_pago,
-    v.metodo_pago AS metodo_pago, -- Método de pago agregado aquí
-    v.estado AS estado,
-    v.cuotas AS cuotas,
-    v.timbrado AS timbrado,
-    dv.producto_id AS producto_id,
-    p.nombre AS producto,
-    dv.cantidad AS cantidad,
-    dv.precio_unitario AS precio_unitario,
-    (dv.cantidad * dv.precio_unitario) AS total_producto,
-    v.nota_credito_id AS nota_credito_id,
-    v.monto_nc_aplicado AS monto_nc_aplicado,
-    COALESCE(sc.monto_total, 0) AS monto_total_servicios,
-    sc.estado AS estado_servicio
-FROM
-    ventas v
-JOIN
-    clientes c ON v.cliente_id = c.id_cliente
-JOIN
-    detalle_venta dv ON v.id = dv.venta_id
-JOIN
-    producto p ON dv.producto_id = p.id_producto
-LEFT JOIN
-    servicios_cabecera sc ON v.solicitud_id = sc.id_cabecera
-WHERE
-    v.id = $1";
-
-$result = pg_query_params($conn, $sql, array($venta_id));
-
-if (!$result) {
-    echo 'Error en la consulta';
-    exit;
+if ($venta_id === 0) {
+    die("ID de venta no proporcionado.");
 }
 
-$comprobante = pg_fetch_all($result);
+// Consulta para obtener los datos de la venta
+$sql_venta = "
+    SELECT 
+        v.id AS id_venta,
+        v.fecha,
+        v.cliente_id,
+        v.forma_pago,
+        v.estado,
+        v.cuotas,
+        v.numero_factura,
+        v.timbrado,
+        v.solicitud_id,
+        c.nombre AS cliente_nombre
+    FROM 
+        ventas v
+    LEFT JOIN 
+        clientes c ON v.cliente_id = c.id_cliente
+    WHERE 
+        v.id = $1
+";
 
-$total_factura = 0;
-foreach ($comprobante as $detalle) {
-    $total_factura += $detalle['total_producto'];
+$result_venta = pg_query_params($conn, $sql_venta, [$venta_id]);
+
+if (!$result_venta || pg_num_rows($result_venta) === 0) {
+    die("No se encontró la venta con ese ID.");
 }
 
-// Calcular el total con servicios si están presentes
-$monto_total_servicios = isset($comprobante[0]['monto_total_servicios']) ? $comprobante[0]['monto_total_servicios'] : 0;
-$total_factura_con_servicios = $total_factura + $monto_total_servicios;
+$venta = pg_fetch_assoc($result_venta);
 
-// Calcular el total con la nota de crédito aplicada
-$monto_nc_aplicado = $comprobante[0]['monto_nc_aplicado'];
-if ($monto_nc_aplicado > $total_factura_con_servicios) {
-    $monto_nc_aplicado = $total_factura_con_servicios;
+// Consulta para obtener los detalles de la venta
+$sql_detalle_venta = "
+    SELECT 
+        dv.id AS id_detalle,
+        dv.producto_id,
+        dv.cantidad,
+        dv.precio_unitario,
+        p.nombre AS producto_nombre
+    FROM 
+        detalle_venta dv
+    LEFT JOIN 
+        producto p ON dv.producto_id = p.id_producto
+    WHERE 
+        dv.venta_id = $1
+";
+
+$result_detalle_venta = pg_query_params($conn, $sql_detalle_venta, [$venta_id]);
+
+if (!$result_detalle_venta) {
+    die("Error al obtener los detalles de la venta.");
 }
-$total_con_nc = $total_factura_con_servicios - $monto_nc_aplicado;
+
+$detalles_venta = pg_fetch_all($result_detalle_venta);
+
+// Consulta para obtener los servicios relacionados (si existe solicitud_id)
+$servicios = [];
+if ($venta['solicitud_id']) {
+    $sql_servicios = "
+        SELECT 
+            sd.id_detalle,
+            sd.id_servicio,
+            sd.costo_servicio,
+            sd.id_promocion,
+            sd.costo_promocion,
+            s.nombre AS servicio_nombre,
+            p.nombre AS promocion_nombre
+        FROM 
+            servicios_detalle sd
+        LEFT JOIN 
+            servicios s ON sd.id_servicio = s.id
+        LEFT JOIN 
+            promociones p ON sd.id_promocion = p.id_promocion
+        WHERE 
+            sd.id_cabecera = $1
+    ";
+
+    $result_servicios = pg_query_params($conn, $sql_servicios, [$venta['solicitud_id']]);
+
+    if (!$result_servicios) {
+        die("Error al obtener los servicios relacionados.");
+    }
+
+    $servicios = pg_fetch_all($result_servicios);
+}
+
+// Calcular monto total dinámicamente
+$monto_total = 0;
+
+// Sumar subtotales de productos
+if ($detalles_venta) {
+    foreach ($detalles_venta as $detalle) {
+        $monto_total += $detalle['cantidad'] * $detalle['precio_unitario'];
+    }
+}
+
+// Sumar costos de servicios
+if ($servicios) {
+    foreach ($servicios as $servicio) {
+        $monto_total += $servicio['costo_servicio'] + $servicio['costo_promocion'];
+    }
+}
+
+// Calcular IVA (10%)
+$iva = $monto_total * 0.10;
+
+// Calcular monto total final (con IVA)
+$monto_total_final = $monto_total + $iva;
+
+// Generar el comprobante
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Comprobante de Factura</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" rel="stylesheet">
     <style>
         body {
-            padding: 20px;
+            font-family: Arial, sans-serif;
+            margin: 20px;
         }
-        .factura {
-            margin: 20px 0;
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        .buttons {
+            margin-top: 20px;
+        }
+        .buttons .button {
+            margin-right: 10px;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        .columns .column {
+            margin-bottom: 20px;
         }
     </style>
-    <script type="text/javascript">
-        function imprimir() {
-            window.print();
-        }
-
-        function volver() {
-            window.location.href = '../venta_v2/ui_facturacion.php';
-        }
-    </script>
 </head>
 <body>
-    <section class="section">
-        <div class="container">
-            <h1 class="title">Factura</h1>
-            <?php if (!empty($comprobante)): ?>
-                <?php $factura = $comprobante[0]; ?>
-                <div class="columns">
-                    <div class="column is-half">
-                        <div class="box">
-                            <p><strong>Número de Factura:</strong> <?= htmlspecialchars($factura['numero_factura']) ?></p>
-                            <p><strong>Fecha:</strong> <?= htmlspecialchars($factura['fecha']) ?></p>
-                            <p><strong>Cliente:</strong> <?= htmlspecialchars($factura['cliente']) ?></p>
-                            <p><strong>Dirección:</strong> <?= htmlspecialchars($factura['direccion']) ?></p>
-                            <p><strong>Teléfono:</strong> <?= htmlspecialchars($factura['telefono']) ?></p>
-                            <p><strong>RUC/CI:</strong> <?= htmlspecialchars($factura['ruc_ci']) ?></p>
-                            <p><strong>Forma de Pago:</strong> <?= htmlspecialchars($factura['forma_pago']) ?></p>
-                            <p><strong>Método de Pago:</strong> <?= htmlspecialchars($factura['metodo_pago']) ?></p> <!-- Nuevo campo -->
-                            <p><strong>Estado:</strong> <?= htmlspecialchars($factura['estado']) ?></p>
-                            <p><strong>Cuotas:</strong> <?= htmlspecialchars($factura['cuotas']) ?></p>
-                            <p><strong>Timbrado:</strong> <?= htmlspecialchars($factura['timbrado']) ?></p>
-                        </div>
-                    </div>
-                    <div class="column is-half">
-                        <div class="box">
-                            <p><strong>Empresa:</strong> <?= htmlspecialchars($empresa['nombre']) ?></p>
-                            <p><strong>Dirección:</strong> <?= htmlspecialchars($empresa['direccion']) ?></p>
-                            <p><strong>Teléfono:</strong> <?= htmlspecialchars($empresa['telefono']) ?></p>
-                            <p><strong>Email:</strong> <?= htmlspecialchars($empresa['email']) ?></p>
-                        </div>
-                    </div>
+
+    <div class="container">
+        <!-- Título -->
+        <h1 class="title">Comprobante de Factura</h1>
+
+        <!-- Fila para Datos de la Empresa y Datos de la Venta -->
+        <div class="columns">
+            <!-- Datos de la Empresa -->
+            <div class="column is-half">
+                <div class="box">
+                    <h2 class="subtitle">Datos de la Empresa</h2>
+                    <p><strong>Nombre:</strong> Mi Empresa S.A.</p>
+                    <p><strong>RUC:</strong> 1234567890</p>
+                    <p><strong>Dirección:</strong> Av. Principal 1234</p>
+                    <p><strong>Teléfono:</strong> (012) 345-6789</p>
                 </div>
-                
-                <h2 class="subtitle">Detalles de la Venta</h2>
-                <table class="table is-fullwidth is-striped">
+            </div>
+
+            <!-- Datos de la Venta -->
+            <div class="column is-half">
+                <div class="box">
+                    <h2 class="subtitle">Datos de la Venta</h2>
+                    <p><strong>ID Venta:</strong> <?= htmlspecialchars($venta['id_venta']) ?></p>
+                    <p><strong>Fecha:</strong> <?= htmlspecialchars($venta['fecha']) ?></p>
+                    <p><strong>Cliente:</strong> <?= htmlspecialchars($venta['cliente_nombre']) ?></p>
+                    <p><strong>Forma de Pago:</strong> <?= htmlspecialchars($venta['forma_pago']) ?></p>
+                    <p><strong>Número de Factura:</strong> <?= htmlspecialchars($venta['numero_factura']) ?></p>
+                    <p><strong>Timbrado:</strong> <?= htmlspecialchars($venta['timbrado']) ?></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detalles de Productos -->
+        <div class="box">
+            <h2 class="subtitle">Detalles de Productos</h2>
+            <?php if ($detalles_venta): ?>
+                <table class="table is-bordered is-striped is-hoverable">
                     <thead>
                         <tr>
-                            <th>ID Producto</th>
                             <th>Producto</th>
                             <th>Cantidad</th>
                             <th>Precio Unitario</th>
-                            <th>Total Producto</th>
+                            <th>Subtotal</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($comprobante as $detalle): ?>
+                        <?php foreach ($detalles_venta as $detalle): ?>
                             <tr>
-                                <td><?= htmlspecialchars($detalle['producto_id']) ?></td>
-                                <td><?= htmlspecialchars($detalle['producto']) ?></td>
+                                <td><?= htmlspecialchars($detalle['producto_nombre']) ?></td>
                                 <td><?= htmlspecialchars($detalle['cantidad']) ?></td>
                                 <td><?= htmlspecialchars($detalle['precio_unitario']) ?></td>
-                                <td><?= htmlspecialchars($detalle['total_producto']) ?></td>
+                                <td><?= htmlspecialchars(number_format($detalle['cantidad'] * $detalle['precio_unitario'], 2)) ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
-                    <tfoot>
-                        <tr>
-                            <th colspan="4">Total Productos</th>
-                            <th><?= htmlspecialchars($total_factura) ?></th>
-                        </tr>
-                        <?php if ($monto_total_servicios > 0): ?>
-                            <tr>
-                                <th colspan="4">Total Servicios</th>
-                                <th><?= htmlspecialchars($monto_total_servicios) ?></th>
-                            </tr>
-                        <?php endif; ?>
-                        <tr>
-                            <th colspan="4">Total Factura</th>
-                            <th><?= htmlspecialchars($total_factura_con_servicios) ?></th>
-                        </tr>
-                    </tfoot>
                 </table>
-                
-                <?php if ($factura['nota_credito_id']) { ?>
-                    <div class="box factura">
-                        <p><strong>Número de Nota de Crédito:</strong> <?= htmlspecialchars($factura['nota_credito_id']) ?></p>
-                        <p><strong>Monto de Nota de Crédito:</strong> <?= htmlspecialchars($monto_nc_aplicado) ?></p>
-                        <p><strong>Total con Nota de Crédito:</strong> <?= htmlspecialchars($total_con_nc) ?></p>
-                    </div>
-                <?php } ?>
-                
-                <!-- Botones para Imprimir y Volver -->
-                <div class="buttons">
-                    <button class="button is-link" onclick="imprimir()">Imprimir</button>
-                    <button class="button is-primary" onclick="volver()">Volver</button>
-                </div>
-                
             <?php else: ?>
-                <p>No se encontraron datos para la venta ID <?= htmlspecialchars($venta_id) ?></p>
+                <p>No hay productos en esta venta.</p>
             <?php endif; ?>
         </div>
-    </section>
-    <?php pg_close($conn); ?>
+
+        <!-- Detalles de Servicios -->
+        <div class="box">
+            <h2 class="subtitle">Detalles de Servicios</h2>
+            <?php if ($servicios): ?>
+                <table class="table is-bordered is-striped is-hoverable">
+                    <thead>
+                        <tr>
+                            <th>Servicio</th>
+                            <th>Promoción</th>
+                            <th>Costo Servicio</th>
+                            <th>Costo Promoción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($servicios as $servicio): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($servicio['servicio_nombre']) ?></td>
+                                <td><?= htmlspecialchars($servicio['promocion_nombre']) ?></td>
+                                <td><?= htmlspecialchars(number_format($servicio['costo_servicio'], 2)) ?></td>
+                                <td><?= htmlspecialchars(number_format($servicio['costo_promocion'], 2)) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <p>No hay servicios relacionados con esta venta.</p>
+            <?php endif; ?>
+        </div>
+
+        <!-- Resumen del Pago -->
+        <div class="box">
+            <h2 class="subtitle">Resumen del Pago</h2>
+            <p><strong>Monto Total (sin IVA):</strong> <?= htmlspecialchars(number_format($monto_total, 2)) ?></p>
+            <p><strong>IVA (10%):</strong> <?= htmlspecialchars(number_format($iva, 2)) ?></p>
+            <p><strong>Monto Total (con IVA):</strong> <?= htmlspecialchars(number_format($monto_total_final, 2)) ?></p>
+        </div>
+
+        <!-- Botones -->
+        <div class="buttons is-centered">
+            <button class="button is-primary" onclick="window.history.back()">Atrás</button>
+            <button class="button is-info" onclick="window.print()">Imprimir</button>
+        </div>
+    </div>
+
 </body>
 </html>

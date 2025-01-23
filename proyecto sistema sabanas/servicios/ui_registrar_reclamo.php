@@ -6,10 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrar Reclamo</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="../servicios/styles_venta.css">
+    <script src="../servicios/navbar.js"></script>
 </head>
 
 <body>
-
+<div id="navbar-container"></div>
 
 
     <section class="section">
