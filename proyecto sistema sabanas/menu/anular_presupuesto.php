@@ -18,8 +18,8 @@ if (!$conn) {
 // Obtener el ID del presupuesto desde la consulta GET
 $id_presupuesto = $_GET['id_presupuesto'];
 
-// Sanitizar el ID del presupuesto para evitar inyección SQL
-$id_presupuesto = pg_escape_string($id_presupuesto);
+// 🔹 Corrección: Pasar la conexión explícitamente a pg_escape_string
+$id_presupuesto = pg_escape_string($conn, $id_presupuesto);
 
 // Preparar la consulta SQL para actualizar el estado
 $sql = "
@@ -31,7 +31,6 @@ $sql = "
 // Preparar la consulta
 $result = pg_prepare($conn, "update_presupuesto", $sql);
 if (!$result) {
-    // Manejo de errores de preparación
     header('Content-Type: application/json');
     echo json_encode(['error' => 'Error en la preparación de la consulta SQL']);
     pg_close($conn);
@@ -42,7 +41,6 @@ if (!$result) {
 $result = pg_execute($conn, "update_presupuesto", array($id_presupuesto));
 
 if (!$result) {
-    // Manejo de errores de consulta
     header('Content-Type: application/json');
     echo json_encode(['error' => 'Error al actualizar el presupuesto']);
     pg_close($conn);

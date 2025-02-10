@@ -123,7 +123,7 @@ pg_close($conn);
         <div class="comprobante-footer">
             <p>Gracias por su pago.</p>
             <a href="javascript:window.print()" class="btn">Imprimir Comprobante</a>
-            <a href="/TALLER DE ANALISIS Y PROGRAMACIÓN I//proyecto sistema sabanas//venta_v2//ui_consulta_cuotas.php" class="btn">Volver al Inicio</a>
+            <a href="/YH/proyecto sistema sabanas/venta_v2/ui_consulta_cuotas.php" class="btn">Volver al Inicio</a>
         </div>
     </div>
 </body>

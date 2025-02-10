@@ -104,10 +104,10 @@
     <div id="navbar-container"></div>
 
     <h2>Registro de Producto</h2>
-    
+
     <form action="procesar_producto.php" method="POST">
         <label for="id_producto">ID del Producto:</label>
-        <input type="text" name="id_producto" id="id_producto" required><br><br>
+        <input type="text" name="id_producto" id="id_producto" ><br><br>
 
         <label for="nombre">Nombre del Producto:</label>
         <input type="text" name="nombre" id="nombre" required><br><br>
@@ -118,6 +118,14 @@
 
         <label for="precio_compra">Precio de Compra:</label>
         <input type="text" name="precio_compra" id="precio_compra" required><br><br>
+
+
+        <label for="tipo_iva">Tipo de IVA:</label>
+        <select name="tipo_iva" id="tipo_iva" required>
+            <option value="0">0%</option>
+            <option value="5">5%</option>
+            <option value="10">10%</option>
+        </select>
 
 
         <button type="submit" name="action" value="insert">Registrar</button>
@@ -145,6 +153,7 @@
                 <th>Nombre</th>
                 <th>Precio Unitario</th>
                 <th>Precio de Compra</th>
+                <th>Tipo Iva</th>
 
             </tr>
         </thead>
@@ -164,6 +173,7 @@
                     newRow.insertCell(1).textContent = row.nombre;
                     newRow.insertCell(2).textContent = row.precio_unitario;
                     newRow.insertCell(3).textContent = row.precio_compra;
+                    newRow.insertCell(4).textContent = row.tipo_iva;
 
                 });
             })

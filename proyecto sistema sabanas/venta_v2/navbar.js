@@ -5,7 +5,7 @@
 
 document.addEventListener("DOMContentLoaded", function() {
     // Cargar la barra de navegación
-    fetch('/YH/proyecto sistema sabanas/menu/navbar.html')
+    fetch('/YH/proyecto sistema sabanas/venta_v2/navbarV.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('navbar-container').innerHTML = data;

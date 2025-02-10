@@ -12,7 +12,7 @@ if (!$conn) {
 
 
 
-$sql = "SELECT id_producto, nombre, precio_unitario, precio_compra FROM producto WHERE estado = 'Activo'";
+$sql = "SELECT id_producto, nombre, precio_unitario, precio_compra, tipo_iva FROM producto WHERE estado = 'Activo'";
 
 
 

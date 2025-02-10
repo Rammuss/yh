@@ -120,6 +120,7 @@ $monto_total_final = $monto_total + $iva;
 ?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -130,35 +131,48 @@ $monto_total_final = $monto_total + $iva;
             font-family: Arial, sans-serif;
             margin: 20px;
         }
+
         .container {
             max-width: 1000px;
             margin: 0 auto;
         }
+
         table {
             border-collapse: collapse;
             width: 100%;
         }
-        table, th, td {
+
+        table,
+        th,
+        td {
             border: 1px solid #ddd;
         }
-        th, td {
+
+        th,
+        td {
             padding: 8px;
             text-align: left;
         }
+
         .buttons {
             margin-top: 20px;
         }
+
         .buttons .button {
             margin-right: 10px;
         }
-        h1, h2 {
+
+        h1,
+        h2 {
             text-align: center;
         }
+
         .columns .column {
             margin-bottom: 20px;
         }
     </style>
 </head>
+
 <body>
 
     <div class="container">
@@ -171,7 +185,7 @@ $monto_total_final = $monto_total + $iva;
             <div class="column is-half">
                 <div class="box">
                     <h2 class="subtitle">Datos de la Empresa</h2>
-                    <p><strong>Nombre:</strong> Mi Empresa S.A.</p>
+                    <p><strong>Nombre:</strong> Beauty Creations</p>
                     <p><strong>RUC:</strong> 1234567890</p>
                     <p><strong>Dirección:</strong> Av. Principal 1234</p>
                     <p><strong>Teléfono:</strong> (012) 345-6789</p>
@@ -182,12 +196,12 @@ $monto_total_final = $monto_total + $iva;
             <div class="column is-half">
                 <div class="box">
                     <h2 class="subtitle">Datos de la Venta</h2>
-                    <p><strong>ID Venta:</strong> <?= htmlspecialchars($venta['id_venta']) ?></p>
-                    <p><strong>Fecha:</strong> <?= htmlspecialchars($venta['fecha']) ?></p>
-                    <p><strong>Cliente:</strong> <?= htmlspecialchars($venta['cliente_nombre']) ?></p>
-                    <p><strong>Forma de Pago:</strong> <?= htmlspecialchars($venta['forma_pago']) ?></p>
-                    <p><strong>Número de Factura:</strong> <?= htmlspecialchars($venta['numero_factura']) ?></p>
-                    <p><strong>Timbrado:</strong> <?= htmlspecialchars($venta['timbrado']) ?></p>
+                    <p><strong>ID Venta:</strong> <?= htmlspecialchars($venta['id_venta'] ?? '') ?></p>
+                    <p><strong>Fecha:</strong> <?= htmlspecialchars($venta['fecha'] ?? '') ?></p>
+                    <p><strong>Cliente:</strong> <?= htmlspecialchars($venta['cliente_nombre'] ?? '') ?></p>
+                    <p><strong>Forma de Pago:</strong> <?= htmlspecialchars($venta['forma_pago'] ?? '') ?></p>
+                    <p><strong>Número de Factura:</strong> <?= htmlspecialchars($venta['numero_factura'] ?? '') ?></p>
+                    <p><strong>Timbrado:</strong> <?= htmlspecialchars($venta['timbrado'] ?? '') ?></p>
                 </div>
             </div>
         </div>
@@ -208,9 +222,9 @@ $monto_total_final = $monto_total + $iva;
                     <tbody>
                         <?php foreach ($detalles_venta as $detalle): ?>
                             <tr>
-                                <td><?= htmlspecialchars($detalle['producto_nombre']) ?></td>
-                                <td><?= htmlspecialchars($detalle['cantidad']) ?></td>
-                                <td><?= htmlspecialchars($detalle['precio_unitario']) ?></td>
+                                <td><?= htmlspecialchars($detalle['producto_nombre'] ?? '') ?></td>
+                                <td><?= htmlspecialchars($detalle['cantidad'] ?? '') ?></td>
+                                <td><?= htmlspecialchars($detalle['precio_unitario'] ?? '') ?></td>
                                 <td><?= htmlspecialchars(number_format($detalle['cantidad'] * $detalle['precio_unitario'], 2)) ?></td>
                             </tr>
                         <?php endforeach; ?>
@@ -237,10 +251,11 @@ $monto_total_final = $monto_total + $iva;
                     <tbody>
                         <?php foreach ($servicios as $servicio): ?>
                             <tr>
-                                <td><?= htmlspecialchars($servicio['servicio_nombre']) ?></td>
-                                <td><?= htmlspecialchars($servicio['promocion_nombre']) ?></td>
-                                <td><?= htmlspecialchars(number_format($servicio['costo_servicio'], 2)) ?></td>
-                                <td><?= htmlspecialchars(number_format($servicio['costo_promocion'], 2)) ?></td>
+
+                                <td><?= htmlspecialchars($servicio['servicio_nombre'] ?? '') ?></td>
+                                <td><?= htmlspecialchars($servicio['promocion_nombre'] ?? '') ?></td>
+                                <td><?= htmlspecialchars(number_format($servicio['costo_servicio'] ?? 0.00, 2)) ?></td>
+                                <td><?= htmlspecialchars(number_format($servicio['costo_promocion'] ?? 0.00, 2)) ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -253,10 +268,11 @@ $monto_total_final = $monto_total + $iva;
         <!-- Resumen del Pago -->
         <div class="box">
             <h2 class="subtitle">Resumen del Pago</h2>
-            <p><strong>Monto Total (sin IVA):</strong> <?= htmlspecialchars(number_format($monto_total, 2)) ?></p>
-            <p><strong>IVA (10%):</strong> <?= htmlspecialchars(number_format($iva, 2)) ?></p>
-            <p><strong>Monto Total (con IVA):</strong> <?= htmlspecialchars(number_format($monto_total_final, 2)) ?></p>
+            <p><strong>Monto Total:</strong> <?= htmlspecialchars(number_format($monto_total, 2)) ?></p>
+            <p><strong>IVA:</strong> <?= htmlspecialchars(number_format($iva, 2)) ?></p>
+            <p><strong>Monto Total Final:</strong> <?= htmlspecialchars(number_format($monto_total_final, 2)) ?></p>
         </div>
+
 
         <!-- Botones -->
         <div class="buttons is-centered">
@@ -266,4 +282,5 @@ $monto_total_final = $monto_total + $iva;
     </div>
 
 </body>
+
 </html>
