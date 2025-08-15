@@ -150,23 +150,27 @@
 
                 // Renderizar las filas de la tabla
                 data.forEach((solicitud) => {
-                    const row = `
-                <tr>
-                    <td>${solicitud.id}</td>
-                    <td>${solicitud.cliente}</td>
-                    <td>${solicitud.ci}</td>
-                    <td>${solicitud.fecha}</td>
-                    <td>${solicitud.monto_total ? parseFloat(solicitud.monto_total).toFixed(2) : "0.00"}</td>
-                    <td>${solicitud.descuento ? parseFloat(solicitud.descuento).toFixed(2) : "0.00"}</td>
-                    <td>${solicitud.estado}</td>
-                    <td>
-                        <button class="button is-small is-info" data-id="${solicitud.id}">Ver</button>
-                        <button class="button is-small is-danger" data-id="${solicitud.id}">Rechazar</button>
-                    </td>
-                </tr>
-            `;
-                    tableBody.innerHTML += row;
-                });
+    // Deshabilitar el botón si el estado es "completado" o "facturado"
+    const disableRejectButton = solicitud.estado === "completado" || solicitud.estado === "facturado";
+    
+    const row = `
+        <tr>
+            <td>${solicitud.id}</td>
+            <td>${solicitud.cliente}</td>
+            <td>${solicitud.ci}</td>
+            <td>${solicitud.fecha}</td>
+            <td>${solicitud.monto_total ? parseFloat(solicitud.monto_total).toFixed(2) : "0.00"}</td>
+            <td>${solicitud.descuento ? parseFloat(solicitud.descuento).toFixed(2) : "0.00"}</td>
+            <td>${solicitud.estado}</td>
+            <td>
+                <button class="button is-small is-info" data-id="${solicitud.id}">Ver</button>
+                <button class="button is-small is-danger" data-id="${solicitud.id}" ${disableRejectButton ? 'disabled' : ''}>Rechazar</button>
+            </td>
+        </tr>
+    `;
+    tableBody.innerHTML += row;
+});
+
             } catch (error) {
                 console.error(error);
                 alert("Ocurrió un error al obtener los datos.");
